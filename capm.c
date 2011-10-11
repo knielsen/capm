@@ -139,27 +139,10 @@ timer2_interrupt_a()
 }
 
 static void
-start_timer(void)
-{
-  timer_count= 0;
-  timer_delay_us(500);
-  serial_print("Start timer ...\r\n");
-}
-
-static void
 handle_timer(void)
 {
-#if 0
-  timer_count++;
-  if (timer_count >= 2000)    /* 5000 * 200usec -> 1 sec */
-    serial_print("Timer up!\r\n");
-  else
-    timer_delay_us(500);
-#else
   next_onewire();
-#endif
 }
-
 
 static void
 timer_delay_ms(uint16_t msec)
@@ -503,15 +486,12 @@ handle_serial_input(void)
     {
     case '?':
     case 'h':
-      serial_print("?/h: This help\r\ns:   Status\r\nt:   Start timer\r\nT:   Start temp. measure\r\nr:   Read rom\r\n");
+      serial_print("?/h: This help\r\ns:   Status\r\nt:   Start temp. measure\r\nr:   Read rom\r\n");
       break;
     case 's':
       showstate();
       break;
     case 't':
-      start_timer();
-      break;
-    case 'T':
       start_temp_measure();
       break;
     case 'r':
