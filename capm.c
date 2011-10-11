@@ -387,6 +387,40 @@ ow_end(uint8_t i)
   return 0;
 }
 
+#define OW_PRINT_TEMP {ow_print_temp, 1}
+static int8_t
+ow_print_temp(uint8_t dummy)
+{
+  char buf[6];
+  uint16_t tu;
+  uint8_t i, j;
+  int16_t t = (int16_t)((uint16_t)ow_read_buf[0] | ((uint16_t)(ow_read_buf[1]) << 8)) / 2;
+  int8_t count_remain = ow_read_buf[6];
+  int16_t t_16 = 16*t - count_remain + (16 - 4);
+  serial_print("Temp=");
+  if (t_16 < 0)
+  {
+    serial_print("-");
+    tu= (uint16_t)0 - (uint16_t)t_16;
+  }
+  else
+    tu= (uint16_t)t_16;
+  sprint_uint16_b10(buf, tu/16);
+  serial_print(buf);
+  serial_print(".");
+  sprint_uint16_b10(buf, tu%16*(10000/16));
+  for (i = 0, j = 0; i < 4; i++)
+  {
+    if (buf[j])
+      j++;
+    else
+      serial_print("0");
+  }
+  serial_print(buf);
+  serial_print("\r\n");
+}
+
+
 static const struct onewire_cmd
 ow_cmds_read_temp_simple[] =
 {
@@ -397,7 +431,7 @@ ow_cmds_read_temp_simple[] =
   OW_SKIP_ROM,
   OW_READ_SCRATCH,
   OW_READ_N(9),
-  OW_END,
+  OW_PRINT_TEMP,
   {0,0}
 };
 
